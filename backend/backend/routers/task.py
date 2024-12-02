@@ -5,12 +5,7 @@ from sqlalchemy import select
 
 from backend.database.models import Task
 from backend.schemas.message import Message
-from backend.schemas.task import (
-    TaskList,
-    TaskPublic,
-    TaskSchema,
-    TaskPatch
-)
+from backend.schemas.task import TaskList, TaskPatch, TaskPublic, TaskSchema
 from backend.utils.dependencies import (
     CurrentUser,
     FilterTaskPage,
