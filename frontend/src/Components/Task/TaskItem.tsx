@@ -1,9 +1,11 @@
 import React from "react";
 import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
+import { FaLocationDot } from "react-icons/fa6";
 import { Task } from "../../Models/Task";
 import { useAuth } from "../../Context/useAuth";
 import { toggleDone } from "../../Services/TaskService";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 interface TaskItemProps {
 	task: Task;
@@ -51,6 +53,11 @@ const TaskItem: React.FC<TaskItemProps> = ({
 				</div>
 			</div>
 			<div className="flex items-center space-x-3">
+				<div>
+					<Link to="/tasks/map">
+						<FaLocationDot className="text-3xl mx-4 text-orange-500 hover:text-orange-600 transition-transform duration-300 ease-in-out transform hover:scale-110" />
+					</Link>
+				</div>
 				<span
 					className={`text-xs px-3 py-1 mx-2 rounded-full ${
 						task.priority === "high"

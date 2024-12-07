@@ -5,6 +5,7 @@ import RegisterPage from "../Pages/RegisterPage/RegisterPage";
 import ProtectedRoute from "./ProtectedRoute";
 import HomePage from "../Pages/HomePage/HomePage";
 import TaskPage from "../Pages/TaskPage/TaskPage";
+import MapPage from "../Pages/MapPage/MapPage";
 
 export const router = createBrowserRouter([
 	{
@@ -19,6 +20,14 @@ export const router = createBrowserRouter([
 				element: (
 					<ProtectedRoute>
 						<TaskPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "/tasks/map",
+				element: (
+					<ProtectedRoute>
+						<MapPage />
 					</ProtectedRoute>
 				),
 			},

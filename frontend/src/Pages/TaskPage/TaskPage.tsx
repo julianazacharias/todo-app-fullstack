@@ -13,7 +13,7 @@ const TaskPage: React.FC = () => {
 	const [showModal, setShowModal] = useState<boolean>(false);
 	const [editTask, setEditTask] = useState<Task | null>(null);
 	const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-	const [deleteTask, setDeleteTask] = useState<Task | undefined>(undefined); // Ensure this can be undefined initially
+	const [deleteTask, setDeleteTask] = useState<Task | undefined>(undefined);
 	const [tasksRefetched, setTasksRefetched] = useState<boolean>(false);
 
 	const { tasks, loading, error } = useFetchTasks(
@@ -35,15 +35,7 @@ const TaskPage: React.FC = () => {
 	const handleSaveTask = useCallback(() => {
 		setTasksRefetched((prev) => !prev);
 		setShowModal(false);
-	}, []);
-
-	const handleDeleteTask = useCallback(() => {
-		setTasksRefetched((prev) => !prev);
 		setShowDeleteModal(false);
-	}, []);
-
-	const handleToggle = useCallback(() => {
-		setTasksRefetched((prev) => !prev);
 	}, []);
 
 	return (
@@ -58,7 +50,7 @@ const TaskPage: React.FC = () => {
 				<div className="flex justify-between items-center px-6 pb-6 bg-gray-800 rounded-lg">
 					<button
 						className="bg-blue-600 px-4 py-2 rounded-md text-white hover:bg-blue-700"
-						onClick={() => handleOpenModal()} // Open modal for new task
+						onClick={() => handleOpenModal()}
 					>
 						New Task
 					</button>
@@ -73,7 +65,7 @@ const TaskPage: React.FC = () => {
 							<p>Please wait...</p>
 						</div>
 					</div>
-				) : tasks ? (
+				) : tasks && tasks.length > 0 ? (
 					<div>
 						<div className="space-y-0">
 							<ul>
@@ -84,7 +76,7 @@ const TaskPage: React.FC = () => {
 												task={task}
 												onEdit={handleOpenModal}
 												onDelete={handleOpenDeleteModal}
-												onToggleDone={handleToggle}
+												onToggleDone={handleSaveTask}
 											/>
 										</div>
 									</li>
@@ -102,24 +94,28 @@ const TaskPage: React.FC = () => {
 							<TaskModalDelete
 								task={deleteTask}
 								onClose={() => setShowDeleteModal(false)}
-								onDelete={handleDeleteTask}
+								onDelete={handleSaveTask}
 							/>
 						)}
+					</div>
+				) : tasks && tasks.length == 0 ? (
+					<div className="mt-20 w-full flex justify-center">
+						<div className="flex flex-col items-center gap-2">
+							<h1 className="text-xl font-bold">No Tasks in this filter</h1>
+						</div>
 					</div>
 				) : error ? (
 					<div className="mt-20 w-full flex justify-center">
 						<div className="flex flex-col items-center gap-2">
 							<CircleX className="w-10 h-10 text-primary" />
 							<h1 className="text-xl font-bold">Error</h1>
-							<p>
-								Something happened, reload the page or please try again later
-							</p>
+							<p>Something happened, please login again or try later</p>
 						</div>
 					</div>
 				) : (
 					<div className="mt-20 w-full flex justify-center">
 						<div className="flex flex-col items-center gap-2">
-							<h1 className="text-xl font-bold">No Tasks in this filter</h1>
+							<h1 className="text-xl font-bold">Please Login again</h1>
 						</div>
 					</div>
 				)}
