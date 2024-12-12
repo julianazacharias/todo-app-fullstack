@@ -77,7 +77,7 @@ def read_user(user_id: int, session: Session):
 
     if not db_user:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='user not found'
+            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
         )
 
     return db_user
@@ -126,7 +126,7 @@ def patch_user(
     return current_user
 
 
-@router.patch('/{user_id}/deactivate', response_model=UserPublic)
+@router.patch('/deactivate/{user_id}', response_model=UserPublic)
 def deactivate_user(
     user_id: int,
     session: Session,
@@ -146,13 +146,13 @@ def deactivate_user(
     return current_user
 
 
-@router.patch('/{user_id}/activate', response_model=UserPublic)
+@router.patch('/activate/{user_id}', response_model=UserPublic)
 def activate_user(user_id: int, session: Session):
     db_user = session.scalar(select(User).where(User.id == user_id))
 
     if not db_user:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='user not found'
+            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
         )
 
     db_user.is_active = True

@@ -86,7 +86,7 @@ def read_task(
 
     if not db_task:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='task not found'
+            status_code=HTTPStatus.NOT_FOUND, detail='Task not found'
         )
 
     return db_task
@@ -124,7 +124,7 @@ def patch_task(
     return db_task
 
 
-@router.patch('/{task_id}/done', response_model=TaskPublic)
+@router.patch('/done/{task_id}', response_model=TaskPublic)
 def done_task(
     task_id: int,
     session: Session,
@@ -153,7 +153,7 @@ def done_task(
     return db_task
 
 
-@router.patch('/{task_id}/deactivate', response_model=TaskPublic)
+@router.patch('/deactivate/{task_id}', response_model=TaskPublic)
 def deactivate_task(task_id: int, session: Session, current_user: CurrentUser):
     db_task = session.scalar(
         select(Task).where(Task.user_id == current_user.id, Task.id == task_id)
@@ -173,13 +173,13 @@ def deactivate_task(task_id: int, session: Session, current_user: CurrentUser):
     return db_task
 
 
-@router.patch('/{task_id}/activate', response_model=TaskPublic)
+@router.patch('/activate/{task_id}', response_model=TaskPublic)
 def activate_task(task_id: int, session: Session):
     db_task = session.scalar(select(Task).where(Task.id == task_id))
 
     if not db_task:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='task not found'
+            status_code=HTTPStatus.NOT_FOUND, detail='Task not found'
         )
 
     db_task.is_active = True

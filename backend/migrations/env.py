@@ -2,6 +2,7 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from geoalchemy2 import alembic_helpers
 
 from alembic import context
 
@@ -17,7 +18,6 @@ config.set_main_option('sqlalchemy.url', Settings().DATABASE_URL)
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
-
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -49,6 +49,14 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_object=alembic_helpers.include_object,
+        process_revision_directives=alembic_helpers.writer,
+        render_item=alembic_helpers.render_item,
+        create_geospatial_table=alembic_helpers.create_geospatial_table,
+        create_geospatial_index=alembic_helpers.create_geospatial_index,
+        drop_geospatial_index=alembic_helpers.drop_geospatial_index,
+        drop_geospatial_table=alembic_helpers.drop_geospatial_table,
+
     )
 
     with context.begin_transaction():
@@ -70,7 +78,14 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection, target_metadata=target_metadata,
+            include_object=alembic_helpers.include_object,
+            process_revision_directives=alembic_helpers.writer,
+            render_item=alembic_helpers.render_item,
+            create_geospatial_table=alembic_helpers.create_geospatial_table,
+            create_geospatial_index=alembic_helpers.create_geospatial_index,
+            drop_geospatial_index=alembic_helpers.drop_geospatial_index,
+            drop_geospatial_table=alembic_helpers.drop_geospatial_table,
         )
 
         with context.begin_transaction():

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.config.settings import Settings
-from backend.routers import auth, task, user
+from backend.routers import auth, location, task, user
 
 settings = Settings()
 
@@ -23,6 +23,7 @@ app.add_middleware(
 app.include_router(user.router)
 app.include_router(auth.router)
 app.include_router(task.router)
+app.include_router(location.router)
 
 
 @app.get('/')
