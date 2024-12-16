@@ -1,3 +1,4 @@
+import json
 from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException
@@ -28,17 +29,14 @@ def create_user_location(
     session: Session,
     current_user: CurrentUser,
 ):
-    # Verify if the user exists and is active
     db_user = session.scalar(
         select(User).where(User.id == current_user.id, User.is_active)
     )
-
     if not db_user:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND, detail='User not found'
         )
 
-    # Create the location instance
     db_location = Location(
         place_id=location.place_id,
         display_name=location.display_name,
@@ -47,16 +45,21 @@ def create_user_location(
         lon=location.lon,
         geom=func.ST_SetSRID(
             func.ST_MakePoint(location.lon, location.lat), 4326
-        ),  # Set the geom field
+        ),
         user_id=current_user.id,
         task_id=None,
     )
-
     session.add(db_location)
     session.commit()
     session.refresh(db_location)
 
-    return db_location
+    # Return response with GeoJSON geom
+    return {
+        **db_location.__dict__,
+        'geom': json.loads(
+            session.scalar(func.ST_AsGeoJSON(db_location.geom))
+        ),
+    }
 
 
 @router.post('/task', response_model=TaskLocationPublic)
@@ -77,6 +80,16 @@ def create_task_location(
             status_code=HTTPStatus.NOT_FOUND, detail='Task not found'
         )
 
+    existing_location = (
+        session.query(Location).filter(Location.task_id == db_task.id).first()
+    )
+
+    if existing_location:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Location already exists for this task',
+        )
+
     db_location = Location(
         place_id=location.place_id,
         display_name=location.display_name,
@@ -87,13 +100,19 @@ def create_task_location(
             func.ST_MakePoint(location.lon, location.lat), 4326
         ),
         task_id=task_id,
+        user_id=None,
     )
 
     session.add(db_location)
     session.commit()
     session.refresh(db_location)
 
-    return db_location
+    return {
+        **db_location.__dict__,
+        'geom': json.loads(
+            session.scalar(func.ST_AsGeoJSON(db_location.geom))
+        ),
+    }
 
 
 @router.put('/user/{user_id}', response_model=UserLocationPublic)
@@ -121,20 +140,26 @@ def update_user_location(
             detail='Could not find this user location',
         )
 
-    db_location.place_id = ((location.place_id),)
-    db_location.display_name = ((location.display_name),)
-    db_location.name = ((location.name),)
-    db_location.lat = ((location.lat),)
-    db_location.lon = ((location.lon),)
-    db_location.geom = (
-        func.ST_SetSRID(func.ST_MakePoint(location.lon, location.lat), 4326),
+    db_location.place_id = (location.place_id,)
+    db_location.display_name = (location.display_name,)
+    db_location.name = (location.name,)
+    db_location.lat = (location.lat,)
+    db_location.lon = (location.lon,)
+    db_location.geom = func.ST_SetSRID(
+        func.ST_MakePoint(location.lon, location.lat), 4326
     )
-    db_location.user_id = current_user.id
+    db_location.user_id = (current_user.id,)
+    db_location.task_id = None
 
     session.commit()
     session.refresh(db_location)
 
-    return db_location
+    return {
+        **db_location.__dict__,
+        'geom': json.loads(
+            session.scalar(func.ST_AsGeoJSON(db_location.geom))
+        ),
+    }
 
 
 @router.put('/task/{task_id}', response_model=TaskLocationPublic)
@@ -170,15 +195,21 @@ def update_task_location(
     db_location.name = location.name
     db_location.lat = location.lat
     db_location.lon = location.lon
-    db_location.geom = (
-        func.ST_SetSRID(func.ST_MakePoint(location.lon, location.lat), 4326),
+    db_location.geom = func.ST_SetSRID(
+        func.ST_MakePoint(location.lon, location.lat), 4326
     )
-    db_location.task_id = location.task_id
+    db_location.task_id = task_id
+    db_location.user_id = None
 
     session.commit()
     session.refresh(db_location)
 
-    return db_location
+    return {
+        **db_location.__dict__,
+        'geom': json.loads(
+            session.scalar(func.ST_AsGeoJSON(db_location.geom))
+        ),
+    }
 
 
 @router.get('/user/{user_id}', response_model=UserLocationPublic)
@@ -204,6 +235,12 @@ def read_user_location(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Could not find this user location',
         )
+    return {
+        **db_location.__dict__,
+        'geom': json.loads(
+            session.scalar(func.ST_AsGeoJSON(db_location.geom))
+        ),
+    }
 
 
 @router.get('/task/{task_id}', response_model=TaskLocationPublic)
@@ -233,7 +270,12 @@ def read_task_location(
             detail='Task does not have a location yet',
         )
 
-    return db_location
+    return {
+        **db_location.__dict__,
+        'geom': json.loads(
+            session.scalar(func.ST_AsGeoJSON(db_location.geom))
+        ),
+    }
 
 
 @router.delete('/user/{user_id}', response_model=Message)

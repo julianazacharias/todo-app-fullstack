@@ -1,6 +1,4 @@
-from geoalchemy2.shape import to_shape
-from pydantic import BaseModel, ConfigDict, field_serializer
-from shapely.geometry import mapping
+from pydantic import BaseModel, ConfigDict
 
 
 class UserLocationSchema(BaseModel):
@@ -18,7 +16,6 @@ class TaskLocationSchema(BaseModel):
     name: str
     lat: float
     lon: float
-    task_id: int
 
 
 class UserLocationPublic(BaseModel):
@@ -32,13 +29,6 @@ class UserLocationPublic(BaseModel):
     user_id: int
     model_config = ConfigDict(from_attributes=True)
 
-    @field_serializer('geom')
-    def serialize_geom(self, geom):
-        if geom:
-            shape = to_shape(geom)  # Convert to a Shapely geometry
-            return mapping(shape)  # Change to `mapping(shape)` for GeoJSON
-        return None
-
 
 class TaskLocationPublic(BaseModel):
     id: int
@@ -50,13 +40,6 @@ class TaskLocationPublic(BaseModel):
     geom: dict
     task_id: int
     model_config = ConfigDict(from_attributes=True)
-
-    @field_serializer('geom')
-    def serialize_geom(self, geom):
-        if geom:
-            shape = to_shape(geom)  # Convert to a Shapely geometry
-            return mapping(shape)  # Change to `mapping(shape)` for GeoJSON
-        return None
 
 
 class LocationList(BaseModel):

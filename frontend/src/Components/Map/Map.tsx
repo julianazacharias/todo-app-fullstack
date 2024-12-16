@@ -2,61 +2,74 @@ import React, { useEffect } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L, { LatLngTuple } from "leaflet";
-import { PositionLatLon } from "../../Models/Location";
+import { PositionLatLon, TaskLocation } from "../../Models/Location";
 
-interface MapProps {
-	selectPosition: PositionLatLon | null;
-}
+const mapUrl = import.meta.env.VITE_MAP_URL;
 
-// Create the custom icon
 const icon = L.icon({
-	iconUrl: "/placeholder.png",
-	iconSize: [38, 38],
+	iconUrl: "/red_placeholder.png",
+	iconSize: [52, 52],
 });
 
-const defaultPosition: LatLngTuple = [51.505, -0.09];
+const savedIcon = L.icon({
+	iconUrl: "/purple_placeholder.png",
+	iconSize: [52, 52],
+});
 
-const ResetCenterView: React.FC<{ selectPosition: PositionLatLon | null }> = ({
+const defaultPosition: LatLngTuple = [-23.5489, -46.6388];
+
+const ResetCenterView: React.FC<{ selectPosition: LatLngTuple }> = ({
 	selectPosition,
 }) => {
 	const map = useMap();
 
 	useEffect(() => {
-		if (selectPosition) {
-			map.setView(
-				L.latLng(selectPosition.lat, selectPosition.lon),
-				map.getZoom(),
-				{
-					animate: true,
-				}
-			);
-		}
+		map.setView(selectPosition, map.getZoom(), { animate: true });
 	}, [selectPosition, map]);
 
 	return null;
 };
 
-// Main Map component
-const Map: React.FC<MapProps> = ({ selectPosition }) => {
+const Map: React.FC<{
+	selectPosition: PositionLatLon | null;
+	currentSavedLocation: TaskLocation | null;
+}> = ({ selectPosition, currentSavedLocation }) => {
 	const locationSelection: LatLngTuple = selectPosition
 		? [selectPosition.lat, selectPosition.lon]
 		: defaultPosition;
 
+	const savedLocationSelection: LatLngTuple = currentSavedLocation
+		? [currentSavedLocation.lat, currentSavedLocation.lon]
+		: defaultPosition;
+
 	return (
-		<MapContainer center={defaultPosition} zoom={13} className="w-full h-full">
+		<MapContainer
+			center={locationSelection}
+			zoom={13}
+			className="w-full h-full"
+		>
 			<TileLayer
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-				url="https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=yCYvdMB2eYnNBRgsoCrG"
+				url={mapUrl}
 			/>
 			{selectPosition && (
 				<Marker position={locationSelection} icon={icon}>
 					<Popup>
-						A pretty CSS3 popup. <br /> Easily customizable. Trazer nome,
-						endereço, [Lat + Lon]
+						Selected Location <br /> {selectPosition.lat}, {selectPosition.lon}
 					</Popup>
 				</Marker>
 			)}
-			<ResetCenterView selectPosition={selectPosition} />
+
+			{currentSavedLocation && (
+				<Marker position={savedLocationSelection} icon={savedIcon}>
+					<Popup>
+						{currentSavedLocation.display_name} <br />
+						Lat: {currentSavedLocation.lat}, Lon: {currentSavedLocation.lon}
+					</Popup>
+				</Marker>
+			)}
+
+			<ResetCenterView selectPosition={savedLocationSelection} />
 		</MapContainer>
 	);
 };

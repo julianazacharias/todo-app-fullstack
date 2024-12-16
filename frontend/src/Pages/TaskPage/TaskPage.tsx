@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from "react";
 import { Loader, CircleX } from "lucide-react";
-import FilterPanel from "../../Components/Task/FilterPanel";
-import TaskModal from "../../Components/Task/TaskModal";
-import TaskItem from "../../Components/Task/TaskItem";
 import { Task } from "../../Models/Task";
 import useFetchTasks from "../../Services/TaskService";
+import FilterPanel from "../../Components/Task/FilterPanel";
+import TaskItem from "../../Components/Task/TaskItem";
+import TaskModal from "../../Components/Task/TaskModal";
 import TaskModalDelete from "../../Components/Task/TaskModalDelete";
 
 const TaskPage: React.FC = () => {

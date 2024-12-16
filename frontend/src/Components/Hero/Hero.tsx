@@ -8,13 +8,13 @@ const Hero = (props: Props) => {
 			id="hero"
 			className="h-screen w-full bg-gradient-to-r from-indigo-950 via-teal-250 to-purple-800 flex items-center"
 		>
-			<div className="container mx-auto flex flex-col-reverse lg:flex-row items-center  px-8 lg:px-28 h-full">
-				<div className="flex flex-col space-y-10 mb-20 lg:w-1/2 h-full align-middle justify-center text-center lg:text-left">
+			<div className="container mx-auto flex flex-col-reverse lg:flex-row items-center px-8 lg:px-28 h-full mb-32">
+				<div className="flex flex-col space-y-10 lg:w-1/2 h-full align-middle justify-center text-center lg:text-left">
 					<h1 className="text-3xl lg:text-5xl font-extrabold text-purple-300 text-wrap leading-tight">
 						My TODO List
 					</h1>
 					<p className="text-lg lg:text-xl text-white">
-						Organize your tasks and stay productive with ease
+						Organize your tasks based on locations and stay productive with ease
 					</p>
 					<div className="mx-auto lg:mx-0">
 						<Link
@@ -25,11 +25,11 @@ const Hero = (props: Props) => {
 						</Link>
 					</div>
 				</div>
-				<div className="lg:w-1/2 flex justify-center lg:justify-end">
+				<div className="lg:w-1/2 flex justify-center lg:justify-end hover:animate-bounce duration-1000 ease-in-out">
 					<img
-						src="https://via.placeholder.com/400" // Replace with your image source
-						alt="TODO App Image"
-						className="w-full max-w-xs lg:max-w-sm"
+						src="/red_placeholder.png" // Replace with your image source
+						alt="Placeholder App Image"
+						className="w-full max-w-xs py-3"
 					/>
 				</div>
 			</div>

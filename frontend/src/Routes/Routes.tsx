@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/tasks/map",
+				path: "/tasks/map/:taskId",
 				element: (
 					<ProtectedRoute>
 						<MapPage />

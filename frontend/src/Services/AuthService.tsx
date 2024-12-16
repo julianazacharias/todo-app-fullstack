@@ -2,12 +2,12 @@ import axios from "axios";
 import { UserProfileToken } from "../Models/User";
 import { handleError } from "../Helpers/ErrorHandler";
 
-const api = "http://localhost:8000/";
+const apiUrl = import.meta.env.VITE_API;
 
 export const loginAPI = async (username: string, password: string) => {
 	try {
 		const response = await axios.post<UserProfileToken>(
-			api + "auth/login",
+			apiUrl + "auth/login",
 			new URLSearchParams({
 				username,
 				password,
@@ -31,15 +31,15 @@ export const registerAPI = async (
 ) => {
 	try {
 		// Step 1: Register the user
-		await axios.post<UserProfileToken>(api + "users", {
+		await axios.post<UserProfileToken>(apiUrl + "users", {
 			email: email,
 			username: username,
 			password: password,
 		});
 
 		// Step 2: Login the user after successful registration
-		const loginResponse = await axios.post<UserProfileToken>(
-			api + "auth/login",
+		const response = await axios.post<UserProfileToken>(
+			apiUrl + "auth/login",
 			new URLSearchParams({
 				email: username,
 				password: password,
@@ -51,7 +51,7 @@ export const registerAPI = async (
 			}
 		);
 
-		return loginResponse;
+		return response;
 	} catch (error) {
 		handleError(error);
 	}

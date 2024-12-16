@@ -1,4 +1,6 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { FaLocationDot } from "react-icons/fa6";
 
 interface FilterPanelProps {
 	filterPriority: string;
@@ -47,6 +49,15 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 					>
 						Done
 					</button>
+				</div>
+				<div className="flex justify-center items-center space-x-3">
+					{" "}
+					<button>
+						<FaLocationDot className="text-4xl text-orange-500 hover:text-orange-600 transition-transform duration-300 ease-in-out transform hover:scale-110" />
+					</button>
+					<div>
+						<h3>Current Location: </h3>
+					</div>
 				</div>
 			</div>
 		</div>

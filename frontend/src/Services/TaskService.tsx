@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Task, TaskList, TaskPriority } from "../Models/Task";
 
-const api = "http://localhost:8000/";
+const apiUrl = import.meta.env.VITE_API;
 
 const useFetchTasks = (
 	filterPriority: string,
@@ -17,7 +17,7 @@ const useFetchTasks = (
 		setLoading(true);
 		setError(null);
 		try {
-			const response = await axios.get<TaskList>(api + "tasks/", {
+			const response = await axios.get<TaskList>(apiUrl + "tasks/", {
 				params: {
 					priority: filterPriority !== "all" ? filterPriority : undefined,
 					done: filterDone !== null ? filterDone : undefined,
@@ -47,7 +47,7 @@ export const saveTask = async (
 	description: string,
 	priority: TaskPriority,
 	done: boolean,
-	user_id: number // Pass user_id here
+	user_id: number
 ): Promise<void> => {
 	try {
 		const requestData = {
@@ -59,10 +59,10 @@ export const saveTask = async (
 		};
 		if (task) {
 			// Update a task
-			await axios.patch<Task>(api + `tasks/${task.id}`, requestData);
+			await axios.patch<Task>(apiUrl + `tasks/${task.id}`, requestData);
 		} else {
 			// Create a new task
-			await axios.post<Task>(api + "tasks/", requestData);
+			await axios.post<Task>(apiUrl + "tasks/", requestData);
 		}
 	} catch (error) {
 		console.error("Error saving task:", error);
@@ -73,8 +73,8 @@ export const saveTask = async (
 export const toggleDone = async (task: Task): Promise<void> => {
 	try {
 		if (task) {
-			// Mark as done/undo done
-			await axios.patch<Task>(api + `tasks/${task.id}/done`);
+			// Mark as done/not done
+			await axios.patch<Task>(apiUrl + `tasks/done/${task.id}`);
 		}
 	} catch (error) {
 		console.error("Error saving task:", error);
@@ -86,24 +86,10 @@ export const deleteTask = async (task: Task): Promise<void> => {
 	try {
 		if (task) {
 			// Deactivate a task
-			await axios.patch<Task>(api + `tasks/${task.id}/deactivate`);
+			await axios.patch<Task>(apiUrl + `tasks/deactivate/${task.id}`);
 		}
 	} catch (error) {
 		console.error("Error deleting task:", error);
 		throw new Error("Error deleting task");
 	}
 };
-
-// COULD ALSO DELETE A TASK FROM DATABASE
-
-// export const deleteTask = async (task: Task): Promise<void> => {
-// 	try {
-// 		if (task) {
-// 			// Delete a task
-// 			await axios.delete(api + `tasks/${task.id}`);
-// 		}
-// 	} catch (error) {
-// 		console.error("Error saving task:", error);
-// 		throw new Error("Error saving task");
-// 	}
-// };

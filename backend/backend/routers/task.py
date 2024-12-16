@@ -24,14 +24,6 @@ def create_task(
     session: Session,
     current_user: CurrentUser,
 ):
-    db_task = Task(
-        title=sanitize(task.title),
-        description=sanitize(task.description),
-        done=task.done,
-        priority=task.priority,
-        user_id=current_user.id,
-    )
-
     existing_task = (
         session.query(Task)
         .filter(Task.user_id == current_user.id, Task.title == task.title)
@@ -43,6 +35,13 @@ def create_task(
             status_code=HTTPStatus.BAD_REQUEST,
             detail='Task title already exists',
         )
+    db_task = Task(
+        title=sanitize(task.title),
+        description=sanitize(task.description),
+        done=task.done,
+        priority=task.priority,
+        user_id=current_user.id,
+    )
 
     session.add(db_task)
     session.commit()
