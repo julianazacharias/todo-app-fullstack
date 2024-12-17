@@ -21,10 +21,13 @@ const TaskItem: React.FC<TaskItemProps> = ({
 	onDelete,
 	onToggleDone,
 }) => {
-	const { user } = useAuth();
+	const { user, isLoggedIn } = useAuth();
 	const [locationName, setLocationName] = useState<string | null>(null);
 
 	useEffect(() => {
+		if (!isLoggedIn) {
+			toast.error("Session expired, please login again to continue");
+		}
 		const fetchLocationName = async () => {
 			try {
 				const location = await readTaskLocation(task.id);
@@ -72,12 +75,12 @@ const TaskItem: React.FC<TaskItemProps> = ({
 			</div>
 			<div className="flex items-center space-x-3">
 				<div className="flex items-center space-x-3 px-4">
-					<p className="text-sm text-gray-400 italic">
-						{locationName || "Loading..."}
-					</p>
 					<Link to={`/tasks/map/${task.id}`}>
 						<FaLocationDot className="text-3xl text-orange-500 hover:text-orange-600 transition-transform duration-300 ease-in-out transform hover:scale-110" />
 					</Link>
+					<p className="text-sm text-gray-400 italic">
+						{locationName || "Loading..."}
+					</p>
 				</div>
 
 				<span
