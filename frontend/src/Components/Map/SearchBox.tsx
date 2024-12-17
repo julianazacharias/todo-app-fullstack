@@ -11,37 +11,111 @@ import {
 import {
 	PositionDetails,
 	PositionDetailsOSM,
+	PositionLatLon,
 	TaskLocation,
+	UserLocation,
 } from "../../Models/Location";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
 	readTaskLocation,
 	saveTaskLocation,
 	deleteTaskLocation,
+	saveUserLocation,
+	readUserLocation,
 } from "../../Services/LocationService";
 import { toast } from "react-toastify";
+import { useAuth } from "../../Context/useAuth";
 
 const nominatimUrl = import.meta.env.VITE_NOMINATIM_BASE_URL;
 
 interface SearchBoxProps {
 	selectPosition: PositionDetails | null;
 	setSelectPosition: (position: PositionDetails | null) => void;
-	setSavedLocation: (location: TaskLocation | null) => void; // Added setter for savedLocation
+	setSavedLocation: (location: TaskLocation | null) => void;
+	setSavedLiveLocation: (location: UserLocation | null) => void;
 }
 
 const SearchBox: React.FC<SearchBoxProps> = ({
 	selectPosition,
 	setSelectPosition,
 	setSavedLocation,
+	setSavedLiveLocation,
 }) => {
 	const [searchText, setSearchText] = useState<string>("");
 	const [listPlace, setListPlace] = useState<PositionDetailsOSM[]>([]);
 	const [existingLocationData, setExistingLocationData] =
 		useState<TaskLocation | null>(null);
 	const { taskId } = useParams<{ taskId: string }>();
+	const [liveLocationLatLon, setLiveLocationLatLon] =
+		useState<PositionLatLon | null>(null);
+	const { user, isLoggedIn } = useAuth();
+	const navigate = useNavigate();
 
-	// Fetch the existing location for the task on component mount or when taskId changes
+	// Fetch the user's live location using Geolocation API
+
 	useEffect(() => {
+		if (!("geolocation" in navigator)) {
+			toast.error("Geolocation is not supported by your browser.");
+			return;
+		}
+
+		navigator.geolocation.getCurrentPosition(
+			(position) => {
+				const { latitude, longitude } = position.coords;
+
+				setLiveLocationLatLon({
+					lat: latitude,
+					lon: longitude,
+				});
+			},
+			(error) => {
+				console.error("Geolocation error:", error);
+				toast.error("Failed to fetch live location.");
+			}
+		);
+	}, []);
+
+	useEffect(() => {
+		if (!liveLocationLatLon || !user?.id) return;
+
+		if (!isLoggedIn) {
+			toast.error("Session expired, please login again to continue");
+		}
+
+		const fetchAndSaveLocation = async () => {
+			try {
+				const existingLocation = await readUserLocation(user.id);
+
+				if (existingLocation) {
+					setSavedLiveLocation(existingLocation);
+				}
+
+				await saveUserLocation(
+					existingLocation,
+					0,
+					`Latitude: ${liveLocationLatLon.lat}, Longitude: ${liveLocationLatLon.lon}`,
+					liveLocationLatLon.lat,
+					liveLocationLatLon.lon,
+					"Live Location",
+					user.id
+				);
+
+				const updatedLocation = await readUserLocation(user.id);
+				setSavedLiveLocation(updatedLocation);
+				toast.success("Live location saved successfully!");
+			} catch (error) {
+				console.error("Failed to save or fetch location:", error);
+				toast.error("Failed to save location.");
+			}
+		};
+
+		fetchAndSaveLocation();
+	}, [liveLocationLatLon, user?.id]);
+
+	useEffect(() => {
+		if (!isLoggedIn) {
+			toast.error("Session expired, please login again to continue");
+		}
 		const fetchExistingLocation = async () => {
 			const taskIdNumber = parseInt(taskId || "0", 10);
 			if (isNaN(taskIdNumber)) {
@@ -52,16 +126,16 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 			try {
 				const location = await readTaskLocation(taskIdNumber);
 				setExistingLocationData(location);
-				setSavedLocation(location); // Set the saved location for the map
+				setSavedLocation(location);
 			} catch (error) {
-				console.error("Failed to fetch existing location:", error);
+				console.error("Failed to fetch task location:", error);
+				toast.error("Failed to fetch task location");
 			}
 		};
 
 		fetchExistingLocation();
 	}, [taskId, setSavedLocation]);
 
-	// Handle search input and fetch places from Nominatim API
 	const handleSearch = () => {
 		const params = {
 			q: searchText,
@@ -80,10 +154,10 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 			});
 	};
 
-	// Handle saving the selected location
-	const handleSaveLocation = async () => {
+	const handleSaveTaskLocation = async () => {
 		if (!selectPosition) {
 			console.error("No position selected");
+			toast.error("Please, select a location");
 			return;
 		}
 
@@ -107,7 +181,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
 			const updatedLocation = await readTaskLocation(taskIdNumber);
 			setExistingLocationData(updatedLocation);
-			setSavedLocation(updatedLocation); // Update map with new saved location
+			setSavedLocation(updatedLocation);
 			toast.success("Location saved successfully!");
 		} catch (error) {
 			console.error("Failed to save location:", error);
@@ -115,7 +189,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 		}
 	};
 
-	const handleRemoveLocation = async () => {
+	const handleRemoveTaskLocation = async () => {
 		if (!existingLocationData) {
 			console.error("No existing location to remove");
 			return;
@@ -124,7 +198,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 			await deleteTaskLocation(existingLocationData);
 			console.log("Location deleted successfully");
 			setExistingLocationData(null);
-			setSavedLocation(null); // Remove saved location from map
+			setSavedLocation(null);
+			navigate("/tasks");
 			toast.success("Location removed successfully!");
 		} catch (error) {
 			console.error("Failed to remove location:", error);
@@ -154,12 +229,37 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 				</div>
 			</div>
 
+			{liveLocationLatLon && (
+				<div className="p-4 m-4 border border-gray-500 rounded-md bg-gray-700">
+					<div className="flex items-center space-x-3 mb-3">
+						<img
+							src="/green_placeholder.png"
+							alt="Placeholder"
+							className="w-7 h-7"
+						/>
+						<h3 className="text-lg font-bold">Your live location</h3>
+					</div>
+					<p>
+						<strong>Latitude:</strong> {liveLocationLatLon?.lat}
+					</p>
+					<p>
+						<strong>Longitude:</strong> {liveLocationLatLon?.lon}
+					</p>
+				</div>
+			)}
+
 			{/* Display Existing Location */}
 			{existingLocationData && (
-				<div className="p-4 m-4 border border-gray-300 rounded-md bg-gray-100">
-					<h3 className="text-lg font-bold mb-2">
-						Saved location in this task
-					</h3>
+				<div className="p-4 m-4 border border-gray-500 rounded-md bg-gray-700">
+					<div className="flex items-center space-x-3 mb-3">
+						<img
+							src="/purple_placeholder.png"
+							alt="Placeholder"
+							className="w-7 h-7"
+						/>
+						<h3 className="text-lg font-bold">Task location</h3>
+					</div>
+
 					<p>
 						<strong>Name:</strong> {existingLocationData.name}
 					</p>
@@ -187,15 +287,19 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 				<div>
 					<button
 						className="bg-slate-500 text-white px-4 py-2 md:px-5 md:py-2 rounded-md text-sm md:text-base hover:bg-slate-600 flex justify-center items-center w-full md:w-auto"
-						onClick={() => setSelectPosition(null)}
+						onClick={() => {
+							setSelectPosition(null);
+							setListPlace([]);
+							setSearchText("");
+						}}
 					>
-						Cancel
+						Clear Search
 					</button>
 				</div>
 				<div>
 					<button
 						className="bg-red-600 text-white px-4 py-2 md:px-5 md:py-2 rounded-md text-sm md:text-base hover:bg-red-700 flex justify-center items-center w-full md:w-auto"
-						onClick={handleRemoveLocation}
+						onClick={handleRemoveTaskLocation}
 					>
 						Remove Location
 					</button>
@@ -203,7 +307,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 				<div>
 					<button
 						className="bg-blue-500 text-white px-4 py-2 md:px-5 md:py-2 rounded-md text-sm md:text-base hover:bg-blue-600 flex justify-center items-center w-full md:w-auto"
-						onClick={handleSaveLocation}
+						onClick={handleSaveTaskLocation}
 					>
 						Save Location
 					</button>

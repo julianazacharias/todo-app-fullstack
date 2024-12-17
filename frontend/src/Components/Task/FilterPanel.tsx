@@ -1,12 +1,14 @@
 import React from "react";
-import { Link } from "react-router-dom";
+
 import { FaLocationDot } from "react-icons/fa6";
+import { UserLocation } from "../../Models/Location";
 
 interface FilterPanelProps {
 	filterPriority: string;
 	setFilterPriority: React.Dispatch<React.SetStateAction<string>>;
 	filterDone: boolean | null;
 	setFilterDone: React.Dispatch<React.SetStateAction<boolean | null>>;
+	currentSavedLiveLocation: UserLocation | null;
 }
 
 const FilterPanel: React.FC<FilterPanelProps> = ({
@@ -14,6 +16,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 	setFilterPriority,
 	filterDone,
 	setFilterDone,
+	currentSavedLiveLocation,
 }) => {
 	return (
 		<div className="flex justify-between items-center p-6 bg-gray-800 rounded-lg">
@@ -56,7 +59,10 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 						<FaLocationDot className="text-4xl text-orange-500 hover:text-orange-600 transition-transform duration-300 ease-in-out transform hover:scale-110" />
 					</button>
 					<div>
-						<h3>Current Location: </h3>
+						<h3>
+							Current Location: {currentSavedLiveLocation?.lat}{" "}
+							{currentSavedLiveLocation?.lon}
+						</h3>
 					</div>
 				</div>
 			</div>

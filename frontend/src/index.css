@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* In your global CSS file */
+
+/* Global CSS file (e.g., styles.css) */
+
+/* index.css */
+
+/* Apply the background color to the root element */
+:root,
+body,
+#root {
+	margin: 0;
+	padding: 0;
+	background-color: #1f2937; /* Dark background */
+	color: #ffffff;
+	min-height: 100vh;
+	font-family: sans-serif;
+	box-sizing: border-box;
+}
+
+/* Style for the OutlinedInput component */
+.MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+	border-color: #6b7280;
+}
+
+/* Set the text color to white at all times */
+.MuiOutlinedInput-root .MuiOutlinedInput-input {
+	color: white;
+}
+
+/* Keep the border color the same on focus */
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+	border-color: #6b7280;
+}

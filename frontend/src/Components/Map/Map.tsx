@@ -2,7 +2,11 @@ import React, { useEffect } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L, { LatLngTuple } from "leaflet";
-import { PositionLatLon, TaskLocation } from "../../Models/Location";
+import {
+	PositionLatLon,
+	TaskLocation,
+	UserLocation,
+} from "../../Models/Location";
 
 const mapUrl = import.meta.env.VITE_MAP_URL;
 
@@ -16,7 +20,13 @@ const savedIcon = L.icon({
 	iconSize: [52, 52],
 });
 
-const defaultPosition: LatLngTuple = [-23.5489, -46.6388];
+const LiveIcon = L.icon({
+	iconUrl: "/green_placeholder.png",
+	iconSize: [52, 52],
+});
+
+const defaultPosition: LatLngTuple = [-27.5954, -48.548]; // Floripa
+// const defaultPosition: LatLngTuple = [-23.5489, -46.6388]; //São Paulo
 
 const ResetCenterView: React.FC<{ selectPosition: LatLngTuple }> = ({
 	selectPosition,
@@ -33,13 +43,18 @@ const ResetCenterView: React.FC<{ selectPosition: LatLngTuple }> = ({
 const Map: React.FC<{
 	selectPosition: PositionLatLon | null;
 	currentSavedLocation: TaskLocation | null;
-}> = ({ selectPosition, currentSavedLocation }) => {
+	currentSavedLiveLocation: UserLocation | null;
+}> = ({ selectPosition, currentSavedLocation, currentSavedLiveLocation }) => {
 	const locationSelection: LatLngTuple = selectPosition
 		? [selectPosition.lat, selectPosition.lon]
 		: defaultPosition;
 
 	const savedLocationSelection: LatLngTuple = currentSavedLocation
 		? [currentSavedLocation.lat, currentSavedLocation.lon]
+		: defaultPosition;
+
+	const savedLiveLocationSelection: LatLngTuple = currentSavedLiveLocation
+		? [currentSavedLiveLocation.lat, currentSavedLiveLocation.lon]
 		: defaultPosition;
 
 	return (
@@ -65,6 +80,17 @@ const Map: React.FC<{
 					<Popup>
 						{currentSavedLocation.display_name} <br />
 						Lat: {currentSavedLocation.lat}, Lon: {currentSavedLocation.lon}
+					</Popup>
+				</Marker>
+			)}
+
+			{currentSavedLiveLocation && (
+				<Marker position={savedLiveLocationSelection} icon={LiveIcon}>
+					<Popup>
+						{currentSavedLiveLocation.display_name} <br />
+						Lat: {currentSavedLiveLocation.lat}, Lon:
+						{currentSavedLiveLocation.lon}
+						{currentSavedLiveLocation.lon}
 					</Popup>
 				</Marker>
 			)}
