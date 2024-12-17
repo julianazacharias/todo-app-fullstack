@@ -36,6 +36,16 @@ def create_user_location(
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND, detail='User not found'
         )
+    
+    existing_location = session.scalar(
+        select(Location).where(Location.user_id == current_user.id)
+    )
+
+    if existing_location:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Location already exists for this user',
+        )
 
     db_location = Location(
         place_id=location.place_id,
@@ -53,7 +63,6 @@ def create_user_location(
     session.commit()
     session.refresh(db_location)
 
-    # Return response with GeoJSON geom
     return {
         **db_location.__dict__,
         'geom': json.loads(
@@ -140,16 +149,17 @@ def update_user_location(
             detail='Could not find this user location',
         )
 
-    db_location.place_id = (location.place_id,)
-    db_location.display_name = (location.display_name,)
-    db_location.name = (location.name,)
-    db_location.lat = (location.lat,)
-    db_location.lon = (location.lon,)
+    db_location.place_id = location.place_id
+    db_location.display_name = location.display_name
+    db_location.name = location.name
+    db_location.lat = location.lat
+    db_location.lon = location.lon
     db_location.geom = func.ST_SetSRID(
         func.ST_MakePoint(location.lon, location.lat), 4326
     )
-    db_location.user_id = (current_user.id,)
+    db_location.user_id = current_user.id
     db_location.task_id = None
+
 
     session.commit()
     session.refresh(db_location)
