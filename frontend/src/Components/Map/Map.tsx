@@ -25,7 +25,7 @@ const LiveIcon = L.icon({
 	iconSize: [52, 52],
 });
 
-const defaultPosition: LatLngTuple = [-27.5954, -48.548]; // Floripa
+const defaultPosition: LatLngTuple = [-25.441105, -49.276855]; // Curitiba
 // const defaultPosition: LatLngTuple = [-23.5489, -46.6388]; //São Paulo
 
 const ResetCenterView: React.FC<{ selectPosition: LatLngTuple }> = ({
