@@ -2,6 +2,10 @@
 
 A full-stack Todo application that allows users to create tasks with a location. The backend is built with FastAPI and the frontend is built with React. This application enables users to add, update, and retrieve tasks along with their location information.
 
+Access Backend in [Production](https://todo-backend-application.fly.dev/docs) with Swagger: https://todo-backend-application.fly.dev/docs
+
+Access the Frontend in [Production](https://todo-app-fullstack-docm.vercel.app/): https://todo-app-fullstack-docm.vercel.app/
+
 ## Project Structure
 
 The project consists of two main folders:
