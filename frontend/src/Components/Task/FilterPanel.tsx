@@ -8,7 +8,7 @@ interface FilterPanelProps {
 	setFilterPriority: React.Dispatch<React.SetStateAction<string>>;
 	filterDone: boolean | null;
 	setFilterDone: React.Dispatch<React.SetStateAction<boolean | null>>;
-	currentSavedLiveLocation: UserLocation | null;
+	currentSavedLiveLocation?: UserLocation | null;
 }
 
 const FilterPanel: React.FC<FilterPanelProps> = ({

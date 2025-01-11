@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 interface Props {}
 
-const Hero = (props: Props) => {
+const Hero = (_props: Props) => {
 	return (
 		<section
 			id="hero"

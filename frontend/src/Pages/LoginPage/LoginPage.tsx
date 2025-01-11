@@ -16,7 +16,7 @@ const validation = Yup.object().shape({
 	password: Yup.string().required("Password is required"),
 });
 
-const LoginPage = (props: Props) => {
+const LoginPage = (_props: Props) => {
 	const { loginUser } = useAuth();
 	const {
 		register,

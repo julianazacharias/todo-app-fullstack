@@ -4,7 +4,7 @@ import { useState } from "react";
 
 interface Props {}
 
-const Navbar = (props: Props) => {
+const Navbar = (_props: Props) => {
 	const { isLoggedIn, user, logout } = useAuth();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
