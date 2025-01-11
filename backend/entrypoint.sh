@@ -4,4 +4,4 @@
 poetry run alembic upgrade head
 
 # Inicia a aplicação
-poetry run fastapi run backend/app.py --host 0.0.0.0
+poetry run uvicorn --host 0.0.0.0 --port 8000 backend.app:app

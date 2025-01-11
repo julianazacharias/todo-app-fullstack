@@ -3,6 +3,8 @@
 A REST API built with FastAPI Sync to create tasks with location.
 This API allows users to perform operations such as adding, updating, and retrieving tasks and its locations.
 
+Access the Todo List Application in [Production](https://todo-backend-application.fly.dev/docs) with Swagger: https://todo-backend-application.fly.dev/docs
+
 ## Technologies used:
 
 <div>
