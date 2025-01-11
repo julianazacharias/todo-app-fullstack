@@ -58,12 +58,12 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 					<button>
 						<FaLocationDot className="text-4xl text-orange-500 hover:text-orange-600 transition-transform duration-300 ease-in-out transform hover:scale-110" />
 					</button>
-					<div>
+					{/* <div>
 						<h3>
 							Current Location: {currentSavedLiveLocation?.lat}{" "}
 							{currentSavedLiveLocation?.lon}
 						</h3>
-					</div>
+					</div> */}
 				</div>
 			</div>
 		</div>
