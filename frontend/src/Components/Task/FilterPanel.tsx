@@ -1,6 +1,5 @@
 import React from "react";
 
-import { FaLocationDot } from "react-icons/fa6";
 import { UserLocation } from "../../Models/Location";
 
 interface FilterPanelProps {
@@ -55,15 +54,14 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 				</div>
 				<div className="flex justify-center items-center space-x-3">
 					{" "}
-					<button>
+					{/* <button>
 						<FaLocationDot className="text-4xl text-orange-500 hover:text-orange-600 transition-transform duration-300 ease-in-out transform hover:scale-110" />
-					</button>
-					{/* <div>
+					</button> */}
+					<div>
 						<h3>
-							Current Location: {currentSavedLiveLocation?.lat}{" "}
-							{currentSavedLiveLocation?.lon}
+							{currentSavedLiveLocation?.lat} {currentSavedLiveLocation?.lon}
 						</h3>
-					</div> */}
+					</div>
 				</div>
 			</div>
 		</div>
